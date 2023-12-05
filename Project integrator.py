@@ -52,8 +52,12 @@ def solve_n_body_problem(bodies, dt, steps):
     :return: None
     '''
 
+    tot_m = 0    # total mass of bodies
+    for body in bodies:
+        tot_m += body.mass
     # initializations
-    r_lst = []
+    r_lst = []    # absolute positions
+    r_cm_lst = []     # CM frame positions
     ini_forces = compute_forces(bodies)  # F(x_0)
     for i in range(len(bodies)):
         bodies[i].velocity += (ini_forces[i] / bodies[i].mass) * (dt / 2)  # v_(1/2)
@@ -64,17 +68,29 @@ def solve_n_body_problem(bodies, dt, steps):
         for body in bodies:
             current_r.append(body.position)
         r_lst.append(np.array(current_r))  # necessary to create new array object to avoid referencing same memory location
+        # center of mass frame
+        r_cm = 0     # position vector of center of mass
+        for i in range(len(bodies)):
+            r_cm += bodies[i].mass * current_r[i]
+        r_cm /= tot_m
+        current_r_cm = np.array(current_r) - r_cm         # positions in the CM frame
+        r_cm_lst.append(current_r_cm)
+        # proceed in time
         integrate(bodies, dt)
-    r_arr = np.array(r_lst)
+    # r_arr = np.array(r_lst)
+    r_arr = np.array(r_cm_lst)
     print(r_arr)  # overview of the positions
+
+    # center of mass frame
+
     flat_r_arr = r_arr.flatten()
 
     fig = plt.figure()
-    axis = plt.axes(xlim=(-5, 5), ylim=(-5, 5))
-    line, = axis.plot([], [], lw=3)
-    def init():
-        line.set_data([], [])
-        return line,
+    # axis = plt.axes(xlim=(-5, 5), ylim=(-5, 5))
+    # line, = axis.plot([], [], lw=3)
+    # def init():
+        # line.set_data([], [])
+        # return line,
 
     for i in range(len(bodies)):
         """ def animate():
@@ -125,10 +141,22 @@ bodies = [Body(1, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
           Body(5, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0]))]
 solve_n_body_problem(bodies, 0.01, 10000)"""
 
-bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
+bodies = [Body(2, np.array([0.0,0.0,0.0]), np.array([-1.0,0.0,0.0])),
+          Body(2, np.array([0.0,1.0,0.0]), np.array([1.0,0.0,0.0]))]
+solve_n_body_problem(bodies, 0.001, 50000)
+
+bodies = [Body(1, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
+          Body(2, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0]))]
+solve_n_body_problem(bodies, 0.0001, 150000)
+
+bodies = [Body(1, np.array([0.0,1.0,0.0]), np.array([1.0,0.0,0.0])),
+          Body(7, np.array([0.0,0.0,0.0]), np.array([0.0,0.0,0.0]))]
+solve_n_body_problem(bodies, 0.0001, 50000)
+
+'''bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
           Body(5.0, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0])),
           Body(0.001, np.array([0.0,0.01,0.0]), np.array([0.0,0.0,0.0]))]
-solve_n_body_problem(bodies, 0.0005, 100000)
+solve_n_body_problem(bodies, 0.0005, 100000)'''
 
 '''bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
           Body(5.0, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0])),
