@@ -77,8 +77,7 @@ def solve_n_body_problem(bodies, dt, steps):
         r_cm_lst.append(current_r_cm)
         # proceed in time
         integrate(bodies, dt)
-    # r_arr = np.array(r_lst)
-    r_arr = np.array(r_cm_lst)
+    r_arr = np.array(r_cm_lst)        # for observer's frame, replace by r_arr = np.array(r_lst)
     print(r_arr)  # overview of the positions
 
     # center of mass frame
