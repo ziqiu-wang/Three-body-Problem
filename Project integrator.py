@@ -9,6 +9,12 @@ class Body:
         self.velocity = velocity
 
 def compute_forces(bodies):
+    '''
+    Calculate force on each body given current positions
+
+    :param bodies: all bodies in consideration
+    :return: forces on the bodies, 1d-array of size n
+    '''
     G = 1
     forces = []
     for i in range(len(bodies)):
@@ -21,20 +27,38 @@ def compute_forces(bodies):
     return np.array(forces)
 
 def integrate(bodies, dt):
-    # Verlet Method
-    forces = compute_forces(bodies)  # F(x_0)
+    '''
+    Integrator that uses Verlet method
+
+    :param bodies: all bodies in consideration
+    :param dt: time step
+    :return: None
+    '''
     for i in range(len(bodies)):
-        # compute v_(1/2)
-        bodies[i].velocity += (forces[i] / bodies[i].mass) * (dt / 2)
         # x_1 = x_0 + dt * v_(1/2)
         bodies[i].position += dt * bodies[i].velocity
     forces = compute_forces(bodies)  # F(x_1)
     for i in range(len(bodies)):
-        # v_1 = v_(1/2) + F(x_1) * dt / 2
-        bodies[i].velocity += forces[i] * dt / 2
+        # v_(3/2) = v_(1/2) + F(x_1) * dt
+        bodies[i].velocity += forces[i] * dt
 
 def solve_n_body_problem(bodies, dt, steps):
+    '''
+    solving the problem using the integrator
+
+    :param bodies: all bodies in consideration
+    :param dt: time step
+    :param steps: number of steps
+    :return: None
+    '''
+
+    # initializations
     r_lst = []
+    ini_forces = compute_forces(bodies)  # F(x_0)
+    for i in range(len(bodies)):
+        bodies[i].velocity += (ini_forces[i] / bodies[i].mass) * (dt / 2)  # v_(1/2)
+
+    # integrate
     for _ in range(steps):
         current_r = []
         for body in bodies:
@@ -46,7 +70,7 @@ def solve_n_body_problem(bodies, dt, steps):
     flat_r_arr = r_arr.flatten()
 
     fig = plt.figure()
-    axis = plt.axes(xlim=(-12, 12), ylim=(-12, 12))
+    axis = plt.axes(xlim=(-5, 5), ylim=(-5, 5))
     line, = axis.plot([], [], lw=3)
     def init():
         line.set_data([], [])
@@ -78,12 +102,12 @@ def solve_n_body_problem(bodies, dt, steps):
         x = flat_r_arr[mask_x != 0]
         y = flat_r_arr[mask_y != 0]
         print(x, y)
-        plt.scatter(x,y,s=3)
+        plt.scatter(x,y,s=1)
         plt.xlabel("$x$")
         plt.ylabel("$y$")
     plt.show()
 
-bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
+"""bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
           Body(2.0, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0])),
           Body(1.0, np.array([0.0,-1.0,0.0]), np.array([0.0,1.0,0.0]))]
 solve_n_body_problem(bodies, 0.01, 10000)
@@ -99,4 +123,14 @@ solve_n_body_problem(bodies, 0.01, 10000)
 
 bodies = [Body(1, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
           Body(5, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0]))]
-solve_n_body_problem(bodies, 0.01, 10000)
+solve_n_body_problem(bodies, 0.01, 10000)"""
+
+bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
+          Body(5.0, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0])),
+          Body(0.001, np.array([0.0,0.01,0.0]), np.array([0.0,0.0,0.0]))]
+solve_n_body_problem(bodies, 0.0005, 100000)
+
+'''bodies = [Body(1.0, np.array([0.0,0.0,0.0]), np.array([1.0,0.0,0.0])),
+          Body(5.0, np.array([1.0,1.0,0.0]), np.array([-1.0,0.0,0.0])),
+          Body(0.01, np.array([0.0,0.01,0.0]), np.array([0.0,0.0,0.0]))]
+solve_n_body_problem(bodies, 0.001, 100000)'''
