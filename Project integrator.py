@@ -79,9 +79,6 @@ def solve_n_body_problem(bodies, dt, steps):
         integrate(bodies, dt)
     r_arr = np.array(r_cm_lst)        # for observer's frame, replace by r_arr = np.array(r_lst)
     print(r_arr)  # overview of the positions
-
-    # center of mass frame
-
     flat_r_arr = r_arr.flatten()
 
     fig = plt.figure()
