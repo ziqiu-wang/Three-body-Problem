@@ -40,7 +40,7 @@ def integrate(bodies, dt):
     forces = compute_forces(bodies)  # F(x_1)
     for i in range(len(bodies)):
         # v_(3/2) = v_(1/2) + F(x_1) * dt
-        bodies[i].velocity += forces[i] * dt
+        bodies[i].velocity += forces[i] / bodies[i].mass * dt
 
 def solve_n_body_problem(bodies, dt, steps):
     '''
